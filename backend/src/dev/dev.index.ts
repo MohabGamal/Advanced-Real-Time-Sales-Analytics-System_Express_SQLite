@@ -1,11 +1,8 @@
-import sqlite3 from "sqlite3"
-import { open } from "sqlite"
+import { initDatabase } from "../config"
+
 
 export const createOrdersTable = async () => {
-	const db = await open({
-		filename: "./sales.sqlite",
-		driver: sqlite3.Database,
-	})
+	const db = await initDatabase()
 	await db.exec(`
     CREATE TABLE IF NOT EXISTS orders (
       product_ID INTEGER PRIMARY KEY AUTOINCREMENT,

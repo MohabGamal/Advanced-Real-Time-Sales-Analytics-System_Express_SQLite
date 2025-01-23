@@ -1,23 +1,10 @@
 import { NextFunction, Request, Response } from "express"
 import { TMiddlewareFn } from "./types"
 import { ServerError } from "./utils/httpErrors"
-import sqlite3 from "sqlite3"
-import { open } from "sqlite"
 import { Database } from "sqlite"
+import { initDatabase } from "./config"
 
-let db: Database | null = null
-open({
-	filename: "./sales.sqlite",
-	driver: sqlite3.Database,
-})
-	.then((dbInstance) => {
-		db = dbInstance
-		console.log("Connected to database.")
-	})
-	.catch((error) => {
-		console.error(error)
-		process.exit(1)
-	})
+const db = initDatabase()
 
 export const dbInitMiddleware: TMiddlewareFn = async (
 	req: Request,
@@ -25,7 +12,7 @@ export const dbInitMiddleware: TMiddlewareFn = async (
 	next: NextFunction
 ) => {
 	try {
-		req.db = db as Database
+		req.db = await db
 		return next()
 	} catch (error) {
 		console.error(error)

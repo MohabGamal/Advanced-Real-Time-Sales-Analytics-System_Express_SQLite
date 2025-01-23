@@ -14,3 +14,25 @@ export type TMiddlewareFn = (
 	res: Response,
 	next: NextFunction
 ) => Promise<void>
+
+
+export type TWeatherApiResponse = {
+	name: string
+	main: { temp: number }
+}
+
+export type TGeminiApiBody = {
+  contents: {
+    parts: { text: string }[]
+  }[]
+}
+
+export type TGeminiApiResponse = {
+  candidates: {
+    content: {
+      parts: {
+        text: string
+      }[]
+    }
+  }[]
+}

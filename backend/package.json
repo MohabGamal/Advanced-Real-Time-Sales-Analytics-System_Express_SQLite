@@ -4,6 +4,7 @@
   "description": "Advanced Real-Time Sales Analytics System",
   "main": "index.ts",
   "scripts": {
+    "db-Order:create": "tsnode src/dev/dev.index.ts",
     "dev": "nodemon --watch src --exec ts-node src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -12,8 +13,8 @@
   "dependencies": {
     "@types/express": "^5.0.0",
     "@types/node": "^22.10.7",
+    "dotenv": "^16.4.7",
     "express": "^4.21.2",
-    "helmet": "^8.0.0",
     "sqlite": "^5.1.1",
     "sqlite3": "^5.1.7"
   },

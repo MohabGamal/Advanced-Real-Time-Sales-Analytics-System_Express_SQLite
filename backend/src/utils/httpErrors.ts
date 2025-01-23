@@ -27,3 +27,4 @@ export class ServerError extends HttpError {
   }
 }
 
+new ServerError()
