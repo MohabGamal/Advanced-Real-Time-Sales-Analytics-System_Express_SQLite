@@ -1,5 +1,6 @@
 import express, { NextFunction, Request, Response } from "express"
 import path from "path"
+import cors from "cors"
 import "./types"
 import { NODE_ENV } from "./constants"
 import apis from "./routes"
@@ -7,6 +8,14 @@ import { dbInitMiddleware } from "./middlewares"
 import { HttpError, NotFoundError, ServerError } from "./utils/httpErrors"
 
 const server = express()
+
+server.use(
+	cors({
+		origin: "http://localhost:5173", // frontend url
+		methods: ["GET", "POST", "PUT", "DELETE"],
+		allowedHeaders: ["Content-Type", "Authorization"],
+	})
+)
 // Middlewares
 server.use(express.urlencoded({ extended: true }))
 server.use(express.json({ limit: "10mb" }))
@@ -22,10 +31,10 @@ server.get("/health-check", (req, res) => {
 // Routes
 server.use("/api", apis)
 
-// // frontend serve
-// server.get("/*", (req, res) => {
-// 	res.sendFile(path.resolve("..", "frontend", "dist", "index.html"))
-// })
+// frontend serve
+server.get("/*", (req, res) => {
+	res.sendFile(path.resolve("..", "frontend", "dist", "index.html"))
+})
 
 server.use((req, res, next) => {
 	return next(new NotFoundError("Not Found"))

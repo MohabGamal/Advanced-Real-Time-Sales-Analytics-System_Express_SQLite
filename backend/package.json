@@ -4,21 +4,26 @@
   "description": "Advanced Real-Time Sales Analytics System",
   "main": "index.ts",
   "scripts": {
-    "db-Order:create": "tsnode src/dev/dev.index.ts",
+    "dev-script": "ts-node src/dev/dev.index.ts",
+    "test": "ts-node src/test/test.index.ts",
     "dev": "nodemon --watch src --exec ts-node src/index.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "prod": "tsc && set NODE_ENV=production&& node dist/index.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@types/express": "^5.0.0",
     "@types/node": "^22.10.7",
+    "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "sqlite": "^5.1.1",
-    "sqlite3": "^5.1.7"
+    "sqlite3": "^5.1.7",
+    "ws": "^8.18.0"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/ws": "^8.5.14",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.3"
   }

@@ -1,0 +1,78 @@
+{
+	"info": {
+		"_postman_id": "7d92c6f6-f296-4e8a-80a3-cf890f81f71e",
+		"name": "Real-Time Sales Analytics",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "21989470"
+	},
+	"item": [
+		{
+			"name": "weather",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8800/api/weather/",
+					"host": [
+						"localhost"
+					],
+					"port": "8800",
+					"path": [
+						"api",
+						"weather",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add order",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"quantity\": 5,\r\n  \"price\": 5\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8800/api/orders/",
+					"host": [
+						"localhost"
+					],
+					"port": "8800",
+					"path": [
+						"api",
+						"orders",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "product recommendation",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8800/api/recommendations",
+					"host": [
+						"localhost"
+					],
+					"port": "8800",
+					"path": [
+						"api",
+						"recommendations"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

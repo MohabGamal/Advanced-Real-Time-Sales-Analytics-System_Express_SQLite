@@ -1,6 +1,6 @@
 import { Database } from "sqlite"
 import { ServerError } from "./utils/httpErrors"
-import { nodeFetch } from "./utils/utils.index"
+import { nodeFetch } from "./utils/util.index"
 import { GEMINI_API_KEY, OPEN_WEATHER_API_KEY } from "./constants"
 import {
 	TGeminiApiBody,
@@ -29,6 +29,11 @@ export const postOrderService = async (params: TPostOrderServiceParams) => {
 }
 
 export const getAnalyticsService = async (db: Database) => {
+	const maxRevenueQuery = `
+      SELECT MAX(quantity * price) AS max_revenue
+      FROM orders
+  `
+	const maxRevenue = await db.get(maxRevenueQuery)
 	const totalRevenueQuery = `
       SELECT SUM(quantity * price) AS total_revenue
       FROM orders
@@ -83,6 +88,7 @@ export const getAnalyticsService = async (db: Database) => {
 	const totalOrdersLastMinute = await db.get(totalOrdersLastMinuteQuery)
 	return {
 		totalRevenue,
+    maxRevenue,
 		topSales,
 		revenueChangeLastMinute,
 		totalOrdersLastMinute,
@@ -119,7 +125,7 @@ export const getRecommendationsService = async (db: Database) => {
 			},
 		],
 	}
-  const recommendationRes = await nodeFetch<TGeminiApiResponse>(
+	const recommendationRes = await nodeFetch<TGeminiApiResponse>(
 		`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
 		{
 			method: "POST",
@@ -129,7 +135,8 @@ export const getRecommendationsService = async (db: Database) => {
 			body: JSON.stringify(aiRecommendationsBody),
 		}
 	)
-  const aiRecommendations = recommendationRes.candidates[0].content.parts[0].text
+	const aiRecommendations =
+		recommendationRes.candidates[0].content.parts[0].text
 	return aiRecommendations
 }
 
@@ -185,6 +192,7 @@ export const getWeatherRecommedationsService = async (
 			body: JSON.stringify(aiRecommendationsBody),
 		}
 	)
-	const aiRecommendations = aiRecommendationRes.candidates[0].content.parts[0].text
+	const aiRecommendations =
+		aiRecommendationRes.candidates[0].content.parts[0].text
 	return aiRecommendations
 }

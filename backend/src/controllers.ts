@@ -1,4 +1,4 @@
-// import { getClientIp } from 'request-ip';
+import { wsActions } from "./constants"
 import {
 	getAnalyticsService,
 	getRecommendationsService,
@@ -8,7 +8,8 @@ import {
 } from "./services"
 import { TMiddlewareFn } from "./types"
 import { BadRequestError, ServerError } from "./utils/httpErrors"
-import { getClientIp } from "./utils/utils.index"
+import { getClientIp } from "./utils/util.index"
+import { broadcast } from "./ws"
 
 type TPostOrderBody = {
 	quantity: number
@@ -18,8 +19,8 @@ type TPostOrderBody = {
 // POST /api/orders/
 export const postOrder: TMiddlewareFn = async (req, res, next) => {
 	const { quantity, price } = req.body as TPostOrderBody
-	if (!quantity || !price) {
-		return next(new BadRequestError("please provide quantity and price"))
+	if (!quantity || !price || price <= 0 || quantity <= 0) {
+		return next(new BadRequestError("please provide proper quantity and price"))
 	}
 	try {
 		const newOrder = await postOrderService({ db: req.db, quantity, price })
@@ -32,6 +33,7 @@ export const postOrder: TMiddlewareFn = async (req, res, next) => {
 			quantity,
 			price,
 		})
+		broadcast(wsActions.NEWORDER, { orderId: newOrder.lastID, quantity, price })
 	} catch (error: any) {
 		return next(new ServerError(error.message))
 	}
@@ -40,11 +42,22 @@ export const postOrder: TMiddlewareFn = async (req, res, next) => {
 // GET /api/analytics/
 export const getAnalytics: TMiddlewareFn = async (req, res, next) => {
 	try {
-		const totalRevenue = await getAnalyticsService(req.db)
-		res.status(200).json({
-			message: "Analytics retrieved successfully!",
+		const analytics = await getAnalyticsService(req.db)
+		const {
 			totalRevenue,
+			maxRevenue,
+			revenueChangeLastMinute,
+			totalOrdersLastMinute,
+		} = analytics
+		res.status(200).json({
+			...analytics,
+			message: "Analytics retrieved successfully!",
+			totalRevenue: totalRevenue.total_revenue,
+			maxRevenue: maxRevenue.max_revenue,
+			revenueChangeLastMinute: revenueChangeLastMinute.percentage_change,
+			totalOrdersLastMinute: totalOrdersLastMinute.TOTAL_ORDERS,
 		})
+		broadcast(wsActions.ANALYTICS, "New analytics data available!")
 	} catch (error: any) {
 		return next(new ServerError(error.message))
 	}
@@ -71,11 +84,13 @@ export const getWeather: TMiddlewareFn = async (req, res, next) => {
 			return next(new BadRequestError("Unable to determine client IP address."))
 		}
 		const weatherData = await getWeatherService(clientIp)
-    const weatherRecommedations = await getWeatherRecommedationsService(weatherData)
+		const weatherRecommendations = await getWeatherRecommedationsService(
+			weatherData
+		)
 		res.status(200).json({
 			message: "Weather data retrieved successfully!",
 			weatherData,
-      weatherRecommedations
+			weatherRecommendations,
 		})
 	} catch (error: any) {
 		return next(new ServerError(error.message))
